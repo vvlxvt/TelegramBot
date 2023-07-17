@@ -60,10 +60,10 @@ async def add_expense(message: types.Message):
     try:
         txt, date = message.text, message.date # берем текст и дату из сообщения
         date_str = date.strftime("%Y-%m-%d") # переводим дату в формат SQL
-        database.message_handler(txt, date_str)
-        await message.answer("принято!")
+        x = database.message_handler(txt, date_str)
+        await message.answer(f"Принято! Добавлено в категории : {x}")
     except:
-        text = "трата должна быть в формате <Трата> <цена>"
+        text = "!трата должна быть в формате <трата> <цена>!"
         await message.answer(text)
         raise exceptions.MessageError ('сообщение не вставилось в базу')
 

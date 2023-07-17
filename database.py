@@ -120,7 +120,11 @@ def message_handler(message, date):
             pack.append(cats.make_note(mes, date))
     else:
         pack = [cats.make_note(message, date)] # формируем экземпляр Note
+    list_of_categories = []
+    for x in pack:
+        list_of_categories.append(x.sub_name)
     insert_data(pack) # вставляем сформированное сообщение в БД
+    return list_of_categories
 
 with sq.connect('newDB.db') as connection:
     cursor = connection.cursor()
