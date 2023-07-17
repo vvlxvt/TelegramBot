@@ -1,0 +1,3 @@
+
+class MessageError(Exception):
+    pass
