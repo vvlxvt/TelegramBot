@@ -11,7 +11,7 @@ bot = Bot(TOKEN_API)
 dp = Dispatcher(bot)
 
 HELP_COMMAND = '''
-/day - статистика за день
+/today - статистика за день
 /month 1-12 статистика за месяц
 /del - удалить последнюю запись 
 '''
@@ -28,8 +28,13 @@ async def start_command(message: types.Message):
 
 @dp.message_handler(commands=['today'])
 async def start_command(message: types.Message):
-    result = database.get_today()
-    await message.answer(result)
+    try:
+        result = database.get_today()
+        await message.answer(result)
+    except:
+        text = "сегодня трат не было!"
+        await message.answer(text)
+        raise exceptions.MessageError(text)
     await message.delete()
 
 @dp.message_handler(commands=['del'])
@@ -49,7 +54,6 @@ async def month(message: types.Message):
         await message.answer(f'общие затраты за : {calendar.month_name[int(month)]}\n {result}')
         with open('diagram.png', 'rb') as photo:
             await bot.send_photo(chat_id=message.chat.id, photo=photo)
-
     except:
         text = "Неверный формат команды /month. Используйте /month <число>."
         await message.answer(text)
