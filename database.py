@@ -77,6 +77,32 @@ def init_table(name):
         cursor.executemany(f'INSERT INTO {name} (sub_name) VALUES (?)', cats.categories )
     connection.commit()
 
+def init_categories():
+    # Создаем таблицу категорий
+    cursor.executescript('''DROP TABLE IF EXISTS categories;
+                       CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY, name TEXT)''')
+    # Создаем таблицу товаров с внешним ключом, связывающим товары с категориями
+    cursor.executescript('''DROP TABLE IF EXISTS products;
+                CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, 
+                name TEXT, 
+                category_id INTEGER, 
+                FOREIGN KEY(category_id) REFERENCES categories(id))''')
+
+    # Получаем id вставленных категорий
+    cursor.execute('SELECT id, name FROM categories')
+    categories = cursor.fetchall()
+
+    # создаем словарь категория - ID
+    category_ids = {name: category_id for category_id, name in categories}
+
+    # Вставляем товары в таблицу products, связывая их с соответствующими категориями
+    for category, products in cats.Category.items():
+        category_id = category_ids[category]
+        for product in products:
+            cursor.execute('INSERT INTO products (name, category_id) VALUES (?, ?)', (product, category_id))
+    connection.commit()
+
+
 def get_today()-> str:
     # Подытог трат за сегодня
     date = datetime.now().date()
@@ -126,6 +152,7 @@ def message_handler(message, date):
     insert_data(pack) # вставляем сформированное сообщение в БД
     return list_of_categories
 
+
 with sq.connect('newDB.db') as connection:
     cursor = connection.cursor()
     init_db()
@@ -143,7 +170,7 @@ with sq.connect('newDB.db') as connection:
                 make_packs(raw_messages)
         except:
             connection.rollback()
-
+    init_categories()
 
 
 

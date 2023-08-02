@@ -5,10 +5,12 @@ import database
 import re
 import calendar
 import exceptions
+from os import getenv
 
-TOKEN_API = '6006947703:AAFiIBqbYWhmZUl6l1crqb3ZbQI4CpiXkoU'
+TOKEN_API = os.getenv('BOT_TOKEN')
 bot = Bot(TOKEN_API)
 dp = Dispatcher(bot)
+id = '541172529'
 
 HELP_COMMAND = '''
 /today - статистика за день
